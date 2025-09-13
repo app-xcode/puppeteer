@@ -1,12 +1,21 @@
-FROM ghcr.io/puppeteer/puppeteer:19.7.2
+# Gunakan Node.js versi LTS
+FROM node:20-alpine
 
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
-    PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome-stable
+# Set working directory
+WORKDIR /app
 
-WORKDIR /usr/src/app
-
+# Salin package.json dan package-lock.json dulu (buat caching)
 COPY package*.json ./
-RUN npm ci
-COPY . .
-CMD [ "node", "index.js" ]
 
+# Install dependencies (kosong, tapi tetap jalankan)
+RUN npm install
+
+# Salin semua file proyek
+COPY . .
+
+# Expose port default Vercel / Node
+EXPOSE 3000
+
+# Jalankan API dengan vercel dev saat development
+# atau bisa diganti "node api/komentar.js" jika standalone server
+CMD ["npx", "vercel", "dev", "--listen", "3000"]
